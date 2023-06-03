@@ -9,17 +9,20 @@ data class MovieResponse(
 )
 
 data class Movie(
+    @SerializedName("id") val id: Int,
     @SerializedName("title") val title: String,
     @SerializedName("overview") val overview: String,
     @SerializedName("poster_path") val posterPath: String
 )  : Parcelable {
     constructor(parcel: Parcel) : this(
+        parcel.readInt(),
         parcel.readString() ?: "",
         parcel.readString() ?: "",
         parcel.readString() ?: ""
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeInt(id)
         parcel.writeString(title)
         parcel.writeString(overview)
         parcel.writeString(posterPath)
