@@ -69,6 +69,7 @@ class MoviesAdapter(private val listener: OnMovieClickListener) : ListAdapter<Mo
         fun onMovieClick(movie: Movie)
     }
 
+
     fun setOnMovieClickListener(listener: OnMovieClickListener) {
         this.onMovieClickListener = listener
     }

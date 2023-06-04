@@ -1,6 +1,8 @@
 package com.sylavana.lfmovies
 
+import android.content.Intent
 import android.os.Bundle
+import android.os.Parcelable
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -16,7 +18,6 @@ class MovieDetailsActivity : AppCompatActivity(), MoviesAdapter.OnMovieClickList
     private lateinit var recommendedMoviesAdapter: MoviesAdapter
 
     override fun onMovieClick(movie: Movie) {
-        // Gérer l'événement de clic sur le film recommandé ici
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
