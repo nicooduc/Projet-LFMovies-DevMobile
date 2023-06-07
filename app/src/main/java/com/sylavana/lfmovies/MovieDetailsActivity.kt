@@ -14,7 +14,7 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class MovieDetailsActivity : AppCompatActivity(), MoviesAdapter.OnMovieClickListener {
-    private val movieService: MovieService = RetrofitClient.create()
+    private val movieService: MovieService by lazy { RetrofitClient.create() }
     private lateinit var recommendedMoviesAdapter: MoviesAdapter
 
     override fun onMovieClick(movie: Movie) {

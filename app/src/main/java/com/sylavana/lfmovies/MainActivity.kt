@@ -45,7 +45,7 @@ class MainActivity : AppCompatActivity(), MoviesAdapter.OnMovieClickListener  {
         buttonSearch.setOnClickListener {
             searchMovies()
         }
-        moviesAdapter.setOnMovieClickListener(this)
+        //moviesAdapter.setOnMovieClickListener(this)
 
         buttonScanBarcode.setOnClickListener {
             startBarcodeScanner()
@@ -114,26 +114,27 @@ class MainActivity : AppCompatActivity(), MoviesAdapter.OnMovieClickListener  {
         startActivity(intent)
     }
 
-    private fun startBarcodeScanner() {
-        val integrator = IntentIntegrator(this)
-        integrator.setDesiredBarcodeFormats(IntentIntegrator.ALL_CODE_TYPES)
-        integrator.setPrompt("Scan a barcode")
-        integrator.setCameraId(0) // Utiliser la caméra arrière par défaut
-        integrator.setBeepEnabled(false) // Désactiver le bip lors de la détection d'un code barre
-        integrator.setBarcodeImageEnabled(false) // Ne pas enregistrer d'image du code barre
-        integrator.initiateScan()
-    }
+        private fun startBarcodeScanner() {
+            val integrator = IntentIntegrator(this)
+            integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE)
+            integrator.setPrompt("Scan a QR code")
+            integrator.setCameraId(0) // Utiliser la caméra arrière par défaut
+            integrator.setBeepEnabled(false) // Désactiver le bip lors de la détection d'un code barre
+            integrator.setBarcodeImageEnabled(false) // Ne pas enregistrer d'image du code barre
+            integrator.initiateScan()
+        }
+
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         val result: IntentResult? = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
-        if (result != null && result.contents != null) {
+        if (result != null && !result.contents.isNullOrEmpty()) {
             val barcode = result.contents // Récupérer la valeur du code barre
             searchMoviesByBarcode(barcode) // Appeler la méthode pour rechercher les films par code barre
         }
     }
 
-    private fun searchMoviesByBarcode(barcode: String) {
+    private fun searchMoviesByBarcode(qrCode: String) {
         showProgressBar()
 
         val retrofit = Retrofit.Builder()
@@ -142,7 +143,7 @@ class MainActivity : AppCompatActivity(), MoviesAdapter.OnMovieClickListener  {
             .build()
 
         val movieService = retrofit.create(MovieService::class.java)
-        val call = movieService.searchMovies(barcode, "1dae3422b396a8df9bb5883b8f798ceb")
+        val call = movieService.searchMovies(qrCode, "1dae3422b396a8df9bb5883b8f798ceb")
 
         call.enqueue(object : Callback<MovieResponse> {
             override fun onResponse(call: Call<MovieResponse>, response: Response<MovieResponse>) {
@@ -153,27 +154,24 @@ class MainActivity : AppCompatActivity(), MoviesAdapter.OnMovieClickListener  {
                     val movies = movieResponse?.results
 
                     if (movies != null && movies.isNotEmpty()) {
-                        val movie = movies[0] // Get the first movie from the list
-                        // Do something with the movie data (e.g., display it on the screen)
+                        val movie = movies[0] // Obtenir le premier film de la liste
+                        // Faire quelque chose avec les données du film (par exemple, l'afficher à l'écran)
                     } else {
-                        // No movies found for the barcode
-                        Toast.makeText(applicationContext, "No movies found for the barcode", Toast.LENGTH_SHORT).show()
+                        // Aucun film trouvé pour le code QR
+                        Toast.makeText(applicationContext, "No movies found for the QR code", Toast.LENGTH_SHORT).show()
                     }
                 } else {
-                    // Handle API error
+                    // Gérer l'erreur de l'API
                     Toast.makeText(applicationContext, "Failed to retrieve movie data", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
                 hideProgressBar()
-                // Handle network failure
+                // Gérer l'échec de la connexion réseau
                 Toast.makeText(applicationContext, "Network request failed", Toast.LENGTH_SHORT).show()
             }
         })
     }
-
-
-
 
 }
