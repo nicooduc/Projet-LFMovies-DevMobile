@@ -13,18 +13,24 @@ data class Movie(
     @SerializedName("title") val title: String,
     @SerializedName("overview") val overview: String,
     @SerializedName("poster_path") val posterPath: String,
-    @SerializedName("release_year") val releaseYear: Int,
-    @SerializedName("duration") val duration: Int,
-    @SerializedName("rating") val rating: Float
-)  : Parcelable {
+    @SerializedName("release_date") val releaseDate: String,
+    @SerializedName("vote_average") val rating: Double,
+    @SerializedName("budget") val budget: Int,
+    @SerializedName("runtime") val runtime: Int,
+    @SerializedName("original_language") val original_language: String,
+    @SerializedName("homepage") val homepage: String
+) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readInt(),
         parcel.readString() ?: "",
         parcel.readString() ?: "",
         parcel.readString() ?: "",
+        parcel.readString() ?: "",
+        parcel.readDouble(),
         parcel.readInt(),
         parcel.readInt(),
-        parcel.readFloat()
+        parcel.readString() ?: "",
+        parcel.readString() ?: ""
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
@@ -32,9 +38,12 @@ data class Movie(
         parcel.writeString(title)
         parcel.writeString(overview)
         parcel.writeString(posterPath)
-        parcel.writeInt(releaseYear)
-        parcel.writeInt(duration)
-        parcel.writeFloat(rating)
+        parcel.writeString(releaseDate)
+        parcel.writeDouble(rating)
+        parcel.writeInt(budget)
+        parcel.writeInt(runtime)
+        parcel.writeString(original_language)
+        parcel.writeString(homepage)
     }
 
     override fun describeContents(): Int {

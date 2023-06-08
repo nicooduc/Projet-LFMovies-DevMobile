@@ -10,6 +10,8 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.sylavana.lfmovies.R
+import java.text.DecimalFormat
+
 
 class MoviesAdapter(private val listener: OnMovieClickListener) : ListAdapter<Movie, MoviesAdapter.MovieViewHolder>(MovieDiffCallback()) {
     private var onMovieClickListener: OnMovieClickListener? = null
@@ -31,11 +33,15 @@ class MoviesAdapter(private val listener: OnMovieClickListener) : ListAdapter<Mo
     inner class MovieViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val imageViewPoster: ImageView = itemView.findViewById(R.id.imageViewPoster)
         private val textViewTitle: TextView = itemView.findViewById(R.id.textViewTitle)
-        private val textViewOverview: TextView = itemView.findViewById(R.id.textViewOverview)
+        private val textViewReleaseDate: TextView = itemView.findViewById(R.id.textViewReleaseDate)
+        private val textViewRating: TextView = itemView.findViewById(R.id.textViewRating)
 
         fun bind(movie: Movie) {
+            val decimalFormat = DecimalFormat("0.00")
             textViewTitle.text = movie.title
-            textViewOverview.text = movie.overview
+            textViewReleaseDate.text = if (movie.releaseDate.isNotBlank()) movie.releaseDate.substring(0, 4) else "N/A"
+            textViewRating.text = if (movie.rating==0.0) "N/A" else decimalFormat.format(movie.rating).toString()
+
 
             Glide.with(itemView)
                 .load("https://image.tmdb.org/t/p/w500${movie.posterPath}")
