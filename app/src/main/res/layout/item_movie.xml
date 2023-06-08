@@ -30,5 +30,26 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/textViewReleaseYear"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textSize="14sp" />
+
+<!--        <TextView-->
+<!--            android:id="@+id/textViewDuration"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginTop="8dp"-->
+<!--            android:textSize="14sp" />-->
+
+<!--        <TextView-->
+<!--            android:id="@+id/textViewRating"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginTop="8dp"-->
+<!--            android:textSize="14sp" />-->
     </LinearLayout>
 </LinearLayout>

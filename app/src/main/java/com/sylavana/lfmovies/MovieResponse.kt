@@ -12,13 +12,19 @@ data class Movie(
     @SerializedName("id") val id: Int,
     @SerializedName("title") val title: String,
     @SerializedName("overview") val overview: String,
-    @SerializedName("poster_path") val posterPath: String
+    @SerializedName("poster_path") val posterPath: String,
+    @SerializedName("release_year") val releaseYear: Int,
+    @SerializedName("duration") val duration: Int,
+    @SerializedName("rating") val rating: Float
 )  : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readInt(),
         parcel.readString() ?: "",
         parcel.readString() ?: "",
-        parcel.readString() ?: ""
+        parcel.readString() ?: "",
+        parcel.readInt(),
+        parcel.readInt(),
+        parcel.readFloat()
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
@@ -26,6 +32,9 @@ data class Movie(
         parcel.writeString(title)
         parcel.writeString(overview)
         parcel.writeString(posterPath)
+        parcel.writeInt(releaseYear)
+        parcel.writeInt(duration)
+        parcel.writeFloat(rating)
     }
 
     override fun describeContents(): Int {

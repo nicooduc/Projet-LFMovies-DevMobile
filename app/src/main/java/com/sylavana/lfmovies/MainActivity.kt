@@ -6,6 +6,7 @@ import android.os.Parcelable
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
@@ -23,7 +24,7 @@ import com.google.zxing.integration.android.IntentResult
 
 class MainActivity : AppCompatActivity(), MoviesAdapter.OnMovieClickListener  {
     private lateinit var editTextQuery: EditText
-    private lateinit var buttonSearch: Button
+    private lateinit var buttonSearch: ImageButton
     private lateinit var progressBar: ProgressBar
     private lateinit var recyclerView: RecyclerView
     private lateinit var moviesAdapter: MoviesAdapter
@@ -37,7 +38,7 @@ class MainActivity : AppCompatActivity(), MoviesAdapter.OnMovieClickListener  {
         progressBar = findViewById(R.id.progressBar)
         recyclerView = findViewById(R.id.recyclerViewMovies)
         moviesAdapter = MoviesAdapter(this)
-        val buttonScanBarcode: Button = findViewById(R.id.btnScanBarcode)
+        val buttonScanBarcode: ImageButton = findViewById(R.id.btnScanBarcode)
 
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = moviesAdapter
@@ -45,7 +46,7 @@ class MainActivity : AppCompatActivity(), MoviesAdapter.OnMovieClickListener  {
         buttonSearch.setOnClickListener {
             searchMovies()
         }
-        //moviesAdapter.setOnMovieClickListener(this)
+            moviesAdapter.setOnMovieClickListener(this)
 
         buttonScanBarcode.setOnClickListener {
             startBarcodeScanner()
@@ -121,6 +122,7 @@ class MainActivity : AppCompatActivity(), MoviesAdapter.OnMovieClickListener  {
             integrator.setCameraId(0) // Utiliser la caméra arrière par défaut
             integrator.setBeepEnabled(false) // Désactiver le bip lors de la détection d'un code barre
             integrator.setBarcodeImageEnabled(false) // Ne pas enregistrer d'image du code barre
+            integrator.setOrientationLocked(false);
             integrator.initiateScan()
         }
 
@@ -130,11 +132,16 @@ class MainActivity : AppCompatActivity(), MoviesAdapter.OnMovieClickListener  {
         val result: IntentResult? = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
         if (result != null && !result.contents.isNullOrEmpty()) {
             val barcode = result.contents // Récupérer la valeur du code barre
-            searchMoviesByBarcode(barcode) // Appeler la méthode pour rechercher les films par code barre
+            val movieId = barcode.toIntOrNull()
+            if (movieId != null) {
+                fetchMovieById(movieId)
+            } else {
+                showError("Invalid movie ID from QR code \"${barcode}\"")
+            }
         }
     }
 
-    private fun searchMoviesByBarcode(qrCode: String) {
+    private fun fetchMovieById(movieId: Int) {
         showProgressBar()
 
         val retrofit = Retrofit.Builder()
@@ -143,22 +150,19 @@ class MainActivity : AppCompatActivity(), MoviesAdapter.OnMovieClickListener  {
             .build()
 
         val movieService = retrofit.create(MovieService::class.java)
-        val call = movieService.searchMovies(qrCode, "1dae3422b396a8df9bb5883b8f798ceb")
+        val call = movieService.getMovieById(movieId, "1dae3422b396a8df9bb5883b8f798ceb")
 
-        call.enqueue(object : Callback<MovieResponse> {
-            override fun onResponse(call: Call<MovieResponse>, response: Response<MovieResponse>) {
+        call.enqueue(object : Callback<Movie> {
+            override fun onResponse(call: Call<Movie>, response: Response<Movie>) {
                 hideProgressBar()
-
                 if (response.isSuccessful) {
                     val movieResponse = response.body()
-                    val movies = movieResponse?.results
-
-                    if (movies != null && movies.isNotEmpty()) {
-                        val movie = movies[0] // Obtenir le premier film de la liste
-                        // Faire quelque chose avec les données du film (par exemple, l'afficher à l'écran)
+                    if (movieResponse != null) {
+                        val movies = listOf(movieResponse)
+                        showMovies(movies)
                     } else {
-                        // Aucun film trouvé pour le code QR
-                        Toast.makeText(applicationContext, "No movies found for the QR code", Toast.LENGTH_SHORT).show()
+                        // Aucun film trouvé pour l'ID donné
+                        Toast.makeText(applicationContext, "No movie found for the ID", Toast.LENGTH_SHORT).show()
                     }
                 } else {
                     // Gérer l'erreur de l'API
@@ -166,12 +170,13 @@ class MainActivity : AppCompatActivity(), MoviesAdapter.OnMovieClickListener  {
                 }
             }
 
-            override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
+            override fun onFailure(call: Call<Movie>, t: Throwable) {
                 hideProgressBar()
                 // Gérer l'échec de la connexion réseau
                 Toast.makeText(applicationContext, "Network request failed", Toast.LENGTH_SHORT).show()
             }
         })
     }
+
 
 }

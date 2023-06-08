@@ -17,4 +17,11 @@ interface MovieService {
         @Path("movie_id") movieId: Int,
         @Query("api_key") apiKey: String
     ): Call<MovieResponse>
+
+    @GET("movie/{movie_id}")
+    fun getMovieById(
+        @Path("movie_id") movieId: Int,
+        @Query("api_key") apiKey: String
+    ): Call<Movie>
+
 }
