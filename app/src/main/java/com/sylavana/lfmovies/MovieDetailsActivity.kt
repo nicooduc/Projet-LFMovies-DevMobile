@@ -29,26 +29,16 @@ class MovieDetailsActivity : AppCompatActivity(), MoviesAdapter.OnMovieClickList
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_movie_details)
 
-        // Récupérer les données du film à partir de l'intent
         val movie = intent.getParcelableExtra<Movie>("movie") as Movie
-
-        // Récupérez l'ID du film sélectionné depuis l'intent
         val selectedMovieId = movie.id
-
         detailsMovies(selectedMovieId)
 
-        // Utilisez les données du film pour afficher les détails
         val decimalFormat = DecimalFormat("0.00")
         val imageViewPoster: ImageView = findViewById(R.id.imageViewPoster)
         val textViewTitle: TextView = findViewById(R.id.textViewTitle)
         val textViewOverview: TextView = findViewById(R.id.textViewOverview)
         val textViewBudget: TextView = findViewById(R.id.textViewBudget)
-        val textViewRuntime: TextView = findViewById(R.id.textViewRuntime)
-//        val textViewGenres: TextView = findViewById(R.id.textViewGenres)
-        val textViewLanguage: TextView = findViewById(R.id.textViewLanguage)
         val textViewReleaseDate: TextView = findViewById(R.id.textViewReleaseDate)
-//        val textViewProductionCountries: TextView = findViewById(R.id.textViewProductionCountries)
-        val textViewHomepage: TextView = findViewById(R.id.textViewHomepage)
         val textViewRating: TextView = findViewById(R.id.textViewRating)
 
         Glide.with(this)
@@ -63,14 +53,11 @@ class MovieDetailsActivity : AppCompatActivity(), MoviesAdapter.OnMovieClickList
         textViewReleaseDate.text = if (movie.releaseDate.isNotBlank()) movie.releaseDate.substring(0, 4) else "N/A"
         textViewRating.text = if (movie.rating==0.0) "N/A" else decimalFormat.format(movie.rating).toString()
 
-
-        // Créez et configurez l'adaptateur pour les films recommandés
         recommendedMoviesAdapter = MoviesAdapter(this)
         val recyclerViewRecommendedMovies: RecyclerView = findViewById(R.id.recyclerViewRecommendedMovies)
         recyclerViewRecommendedMovies.adapter = recommendedMoviesAdapter
         recyclerViewRecommendedMovies.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
 
-        // Appelez la méthode pour récupérer les films recommandés
         fetchRecommendedMovies(selectedMovieId)
     }
 
@@ -85,11 +72,13 @@ class MovieDetailsActivity : AppCompatActivity(), MoviesAdapter.OnMovieClickList
                         val recommendedMovies = movieResponse.results
                         showRecommendedMovies(recommendedMovies)
                     }
+                } else {
+                    Toast.makeText(applicationContext, "Failed to retrieve movie data", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
-                // Gestion des erreurs
+                Toast.makeText(applicationContext, "Network request failed", Toast.LENGTH_SHORT).show()
             }
         })
     }
@@ -121,11 +110,13 @@ class MovieDetailsActivity : AppCompatActivity(), MoviesAdapter.OnMovieClickList
                             textViewHomepage.text = "N/A"
                         }
                     }
+                } else {
+                    Toast.makeText(applicationContext, "Failed to retrieve movie data", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<Movie>, t: Throwable) {
-                // Gestion des erreurs
+                Toast.makeText(applicationContext, "Network request failed", Toast.LENGTH_SHORT).show()
             }
         })
     }

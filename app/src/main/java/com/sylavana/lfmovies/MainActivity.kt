@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.View
-import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ProgressBar
@@ -75,13 +74,15 @@ class MainActivity : AppCompatActivity(), MoviesAdapter.OnMovieClickListener  {
                             val movies = movieResponse.results
                             showMovies(movies)
                         }
+                    } else {
+                        Toast.makeText(applicationContext, "Failed to retrieve movie data", Toast.LENGTH_SHORT).show()
                     }
                     hideProgressBar()
                 }
 
                 override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
                     hideProgressBar()
-                    showError("Error occurred: ${t.message}")
+                    Toast.makeText(applicationContext, "Network request failed", Toast.LENGTH_SHORT).show()
                 }
             })
         } else {
@@ -161,18 +162,15 @@ class MainActivity : AppCompatActivity(), MoviesAdapter.OnMovieClickListener  {
                         val movies = listOf(movieResponse)
                         showMovies(movies)
                     } else {
-                        // Aucun film trouvé pour l'ID donné
                         Toast.makeText(applicationContext, "No movie found for the ID", Toast.LENGTH_SHORT).show()
                     }
                 } else {
-                    // Gérer l'erreur de l'API
                     Toast.makeText(applicationContext, "Failed to retrieve movie data", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<Movie>, t: Throwable) {
                 hideProgressBar()
-                // Gérer l'échec de la connexion réseau
                 Toast.makeText(applicationContext, "Network request failed", Toast.LENGTH_SHORT).show()
             }
         })

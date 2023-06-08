@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.sylavana.lfmovies.R
 import java.text.DecimalFormat
 
 
@@ -47,6 +46,7 @@ class MoviesAdapter(private val listener: OnMovieClickListener) : ListAdapter<Mo
                 .load("https://image.tmdb.org/t/p/w500${movie.posterPath}")
                 .placeholder(R.drawable.placeholder_poster)
                 .error(R.drawable.error_poster)
+                .fitCenter()
                 .into(imageViewPoster)
         }
 
