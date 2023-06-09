@@ -26,6 +26,7 @@ class MovieDetailsActivity : AppCompatActivity(), MoviesAdapter.OnMovieClickList
         val database = AppDatabase.getInstance(this)
         database.filmDao()
     }
+    var isFavorite = false
 
 
     override fun onMovieClick(movie: Movie) {
@@ -52,8 +53,16 @@ class MovieDetailsActivity : AppCompatActivity(), MoviesAdapter.OnMovieClickList
         val buttonFavoris: ImageButton = findViewById(R.id.btnFavoris)
         val buttonHome: ImageButton = findViewById(R.id.buttonHome)
 
+        //isFavorite = filmDao.checkFilmExists(movie.id) // Fait planter l'application
+
+        if (isFavorite) {
+            buttonFavoris.setImageResource(R.drawable.ic_star_favoris_full)
+        } else {
+            buttonFavoris.setImageResource(R.drawable.ic_star_favoris_empty)
+        }
+
         buttonFavoris.setOnClickListener {
-            addFavMovie(movie)
+            addFavMovie(movie, buttonFavoris)
         }
 
         buttonHome.setOnClickListener {
@@ -81,10 +90,20 @@ class MovieDetailsActivity : AppCompatActivity(), MoviesAdapter.OnMovieClickList
         fetchRecommendedMovies(selectedMovieId)
     }
 
-    private fun addFavMovie(movie: Movie) {
-        val film = Film(movie.id, movie.title)
-        //filmDao.ajouterFilm(film) // Fait planter l'application
-        Toast.makeText(this@MovieDetailsActivity, "Film ajouté aux favoris", Toast.LENGTH_SHORT).show()
+    private fun addFavMovie(movie: Movie, buttonFavoris: ImageButton) {
+        if (isFavorite) {
+            val film = Film(movie.id, movie.title)
+            //filmDao.deleteFilm(movie.id) // Fait planter l'application
+            Toast.makeText(this@MovieDetailsActivity, "Film retiré des favoris", Toast.LENGTH_SHORT).show()
+            buttonFavoris.setImageResource(R.drawable.ic_star_favoris_empty)
+            isFavorite = false
+        } else {
+            val film = Film(movie.id, movie.title)
+            //filmDao.ajouterFilm(film) // Fait planter l'application
+            Toast.makeText(this@MovieDetailsActivity, "Film ajouté aux favoris", Toast.LENGTH_SHORT).show()
+            buttonFavoris.setImageResource(R.drawable.ic_star_favoris_full)
+            isFavorite = true
+        }
     }
 
     private fun fetchRecommendedMovies(movieId: Int) {
