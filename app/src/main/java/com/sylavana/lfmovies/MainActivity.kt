@@ -51,6 +51,8 @@ class MainActivity : AppCompatActivity(), MoviesAdapter.OnMovieClickListener  {
             startBarcodeScanner()
         }
 
+        fetchMovieTendance()
+
     }
 
     private fun searchMovies() {
@@ -170,6 +172,38 @@ class MainActivity : AppCompatActivity(), MoviesAdapter.OnMovieClickListener  {
             }
 
             override fun onFailure(call: Call<Movie>, t: Throwable) {
+                hideProgressBar()
+                Toast.makeText(applicationContext, "Network request failed", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    private fun fetchMovieTendance() {
+        showProgressBar()
+
+        val retrofit = Retrofit.Builder()
+            .baseUrl("https://api.themoviedb.org/3/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        val movieService = retrofit.create(MovieService::class.java)
+        val call = movieService.getPopularMovies("1dae3422b396a8df9bb5883b8f798ceb")
+
+        call.enqueue(object : Callback<MovieResponse> {
+            override fun onResponse(call: Call<MovieResponse>, response: Response<MovieResponse>) {
+                if (response.isSuccessful) {
+                    val movieResponse = response.body()
+                    if (movieResponse != null) {
+                        val movies = movieResponse.results
+                        showMovies(movies)
+                    }
+                } else {
+                    Toast.makeText(applicationContext, "Failed to retrieve movie data", Toast.LENGTH_SHORT).show()
+                }
+                hideProgressBar()
+            }
+
+            override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
                 hideProgressBar()
                 Toast.makeText(applicationContext, "Network request failed", Toast.LENGTH_SHORT).show()
             }

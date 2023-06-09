@@ -1,8 +1,12 @@
 package com.sylavana.lfmovies
 
+import AppDatabase
+import Film
+import FilmDao
 import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -18,6 +22,11 @@ import java.text.DecimalFormat
 class MovieDetailsActivity : AppCompatActivity(), MoviesAdapter.OnMovieClickListener {
     val movieService: MovieService = RetrofitClient.create()
     private lateinit var recommendedMoviesAdapter: MoviesAdapter
+    private val filmDao: FilmDao by lazy {
+        val database = AppDatabase.getInstance(this)
+        database.filmDao()
+    }
+
 
     override fun onMovieClick(movie: Movie) {
         val intent = Intent(this, MovieDetailsActivity::class.java)
@@ -40,6 +49,17 @@ class MovieDetailsActivity : AppCompatActivity(), MoviesAdapter.OnMovieClickList
         val textViewBudget: TextView = findViewById(R.id.textViewBudget)
         val textViewReleaseDate: TextView = findViewById(R.id.textViewReleaseDate)
         val textViewRating: TextView = findViewById(R.id.textViewRating)
+        val buttonFavoris: ImageButton = findViewById(R.id.btnFavoris)
+        val buttonHome: ImageButton = findViewById(R.id.buttonHome)
+
+        buttonFavoris.setOnClickListener {
+            addFavMovie(movie)
+        }
+
+        buttonHome.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
 
         Glide.with(this)
             .load("https://image.tmdb.org/t/p/w500${movie.posterPath}")
@@ -59,6 +79,12 @@ class MovieDetailsActivity : AppCompatActivity(), MoviesAdapter.OnMovieClickList
         recyclerViewRecommendedMovies.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
 
         fetchRecommendedMovies(selectedMovieId)
+    }
+
+    private fun addFavMovie(movie: Movie) {
+        val film = Film(movie.id, movie.title)
+        //filmDao.ajouterFilm(film) // Fait planter l'application
+        Toast.makeText(this@MovieDetailsActivity, "Film ajouté aux favoris", Toast.LENGTH_SHORT).show()
     }
 
     private fun fetchRecommendedMovies(movieId: Int) {
@@ -93,16 +119,12 @@ class MovieDetailsActivity : AppCompatActivity(), MoviesAdapter.OnMovieClickList
                     if (movie != null) {
                         val textViewBudget: TextView = findViewById(R.id.textViewBudget)
                         val textViewRuntime: TextView = findViewById(R.id.textViewRuntime)
-//                        val textViewGenres: TextView = findViewById(R.id.textViewGenres)
                         val textViewLanguage: TextView = findViewById(R.id.textViewLanguage)
-//                        val textViewProductionCountries: TextView = findViewById(R.id.textViewProductionCountries)
                         val textViewHomepage: TextView = findViewById(R.id.textViewHomepage)
 
                         textViewBudget.text = if (movie.budget==0) "N/A" else movie.budget.toString()
                         textViewRuntime.text = if (movie.runtime==0) "N/A" else "${movie.runtime} min"
-//                        textViewGenres.text = getGenresString(movie.genres)
                         textViewLanguage.text = movie.original_language
-//                        textViewProductionCountries.text = getProductionCountriesString(movie.productionCountries)
                         if (!movie.homepage.isNullOrEmpty()) {
                             textViewHomepage.text = movie.homepage
                             textViewHomepage.autoLinkMask = android.text.util.Linkify.WEB_URLS
